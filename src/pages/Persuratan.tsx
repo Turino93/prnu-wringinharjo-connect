@@ -13,7 +13,8 @@ import {
   FileText,
   Filter,
   Download,
-  Loader2
+  Loader2,
+  Lock
 } from "lucide-react";
 import {
   Dialog,
@@ -32,8 +33,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLetters, useCreateLetter, type LetterType, type LetterStatus } from "@/hooks/useLetters";
+import { useLetters, useCreateLetter, type LetterType } from "@/hooks/useLetters";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 const Persuratan = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,6 +49,7 @@ const Persuratan = () => {
     isi: "",
   });
 
+  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const { data: suratMasuk = [], isLoading: loadingMasuk } = useLetters("masuk");
   const { data: suratKeluar = [], isLoading: loadingKeluar } = useLetters("keluar");
   const createLetter = useCreateLetter();
@@ -119,6 +123,30 @@ const Persuratan = () => {
       {/* Main Content */}
       <section className="py-12">
         <div className="container mx-auto px-4">
+          {/* Admin Notice */}
+          {!authLoading && !isAdmin && (
+            <div className="mb-6 p-4 bg-muted rounded-xl border border-border flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Lock className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-foreground font-medium">
+                  Mode Baca Saja
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {user 
+                    ? "Anda login sebagai user biasa. Hubungi administrator untuk mendapatkan akses mengelola surat."
+                    : "Login sebagai admin untuk dapat menambah dan mengelola surat."}
+                </p>
+              </div>
+              {!user && (
+                <Link to="/login">
+                  <Button size="sm">Login Admin</Button>
+                </Link>
+              )}
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-card rounded-xl p-5 shadow-card border border-border">
@@ -187,89 +215,91 @@ const Persuratan = () => {
                 <Download className="w-4 h-4" />
                 Export
               </Button>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    Buat Surat
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
-                  <DialogHeader>
-                    <DialogTitle>Buat Surat Baru</DialogTitle>
-                    <DialogDescription>
-                      Isi formulir berikut untuk membuat surat baru.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="type">Jenis Surat</Label>
-                      <Select 
-                        value={formData.type} 
-                        onValueChange={(value: LetterType) => setFormData({ ...formData, type: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih jenis surat" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="masuk">Surat Masuk</SelectItem>
-                          <SelectItem value="keluar">Surat Keluar</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="nomor">Nomor Surat</Label>
-                      <Input 
-                        id="nomor" 
-                        placeholder="Contoh: 001/SK/PRNU-WRH/I/2024" 
-                        value={formData.nomor_surat}
-                        onChange={(e) => setFormData({ ...formData, nomor_surat: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="perihal">Perihal</Label>
-                      <Input 
-                        id="perihal" 
-                        placeholder="Masukkan perihal surat" 
-                        value={formData.perihal}
-                        onChange={(e) => setFormData({ ...formData, perihal: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tujuan">
-                        {formData.type === "keluar" ? "Penerima" : "Pengirim"}
-                      </Label>
-                      <Input 
-                        id="tujuan" 
-                        placeholder={`Masukkan nama ${formData.type === "keluar" ? "penerima" : "pengirim"}`}
-                        value={formData.pengirim_penerima}
-                        onChange={(e) => setFormData({ ...formData, pengirim_penerima: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="isi">Isi Surat</Label>
-                      <Textarea 
-                        id="isi" 
-                        placeholder="Masukkan isi surat..." 
-                        rows={4} 
-                        value={formData.isi}
-                        onChange={(e) => setFormData({ ...formData, isi: e.target.value })}
-                      />
-                    </div>
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                        Batal
-                      </Button>
-                      <Button type="submit" disabled={createLetter.isPending}>
-                        {createLetter.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        Simpan Surat
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
+              {isAdmin && (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Buat Surat
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Buat Surat Baru</DialogTitle>
+                      <DialogDescription>
+                        Isi formulir berikut untuk membuat surat baru.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="type">Jenis Surat</Label>
+                        <Select 
+                          value={formData.type} 
+                          onValueChange={(value: LetterType) => setFormData({ ...formData, type: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih jenis surat" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="masuk">Surat Masuk</SelectItem>
+                            <SelectItem value="keluar">Surat Keluar</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="nomor">Nomor Surat</Label>
+                        <Input 
+                          id="nomor" 
+                          placeholder="Contoh: 001/SK/PRNU-WRH/I/2024" 
+                          value={formData.nomor_surat}
+                          onChange={(e) => setFormData({ ...formData, nomor_surat: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="perihal">Perihal</Label>
+                        <Input 
+                          id="perihal" 
+                          placeholder="Masukkan perihal surat" 
+                          value={formData.perihal}
+                          onChange={(e) => setFormData({ ...formData, perihal: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="tujuan">
+                          {formData.type === "keluar" ? "Penerima" : "Pengirim"}
+                        </Label>
+                        <Input 
+                          id="tujuan" 
+                          placeholder={`Masukkan nama ${formData.type === "keluar" ? "penerima" : "pengirim"}`}
+                          value={formData.pengirim_penerima}
+                          onChange={(e) => setFormData({ ...formData, pengirim_penerima: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="isi">Isi Surat</Label>
+                        <Textarea 
+                          id="isi" 
+                          placeholder="Masukkan isi surat..." 
+                          rows={4} 
+                          value={formData.isi}
+                          onChange={(e) => setFormData({ ...formData, isi: e.target.value })}
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                          Batal
+                        </Button>
+                        <Button type="submit" disabled={createLetter.isPending}>
+                          {createLetter.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                          Simpan Surat
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </div>
 
