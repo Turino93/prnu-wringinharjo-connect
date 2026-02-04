@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      letters: {
+        Row: {
+          created_at: string
+          id: string
+          isi: string | null
+          nomor_surat: string
+          penerima: string | null
+          pengirim: string | null
+          perihal: string
+          status: Database["public"]["Enums"]["letter_status"]
+          tanggal: string
+          type: Database["public"]["Enums"]["letter_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          isi?: string | null
+          nomor_surat: string
+          penerima?: string | null
+          pengirim?: string | null
+          perihal: string
+          status?: Database["public"]["Enums"]["letter_status"]
+          tanggal?: string
+          type: Database["public"]["Enums"]["letter_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          isi?: string | null
+          nomor_surat?: string
+          penerima?: string | null
+          pengirim?: string | null
+          perihal?: string
+          status?: Database["public"]["Enums"]["letter_status"]
+          tanggal?: string
+          type?: Database["public"]["Enums"]["letter_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +64,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      letter_status: "pending" | "proses" | "selesai"
+      letter_type: "masuk" | "keluar"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +192,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      letter_status: ["pending", "proses", "selesai"],
+      letter_type: ["masuk", "keluar"],
+    },
   },
 } as const
