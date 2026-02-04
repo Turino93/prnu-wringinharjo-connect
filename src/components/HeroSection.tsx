@@ -18,14 +18,14 @@ const HeroSection = () => {
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up text-card drop-shadow-lg" style={{ animationDelay: "0.1s" }}>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up text-foreground" style={{ animationDelay: "0.1s" }}>
             Pimpinan Ranting<br />
-            <span className="text-secondary drop-shadow-md">Nahdlatul Ulama</span><br />
+            <span className="text-secondary">Nahdlatul Ulama</span><br />
             Wringinharjo
           </h1>
 
           {/* Tagline */}
-          <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto animate-fade-in-up text-card/90 drop-shadow-md" style={{ animationDelay: "0.2s" }}>
+          <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto animate-fade-in-up text-foreground/80" style={{ animationDelay: "0.2s" }}>
             Menjaga dan menyebarkan ajaran Islam Ahlussunnah wal Jama'ah 
             dengan penuh kedamaian, kerahmatan, dan kemaslahatan umat.
           </p>
@@ -48,18 +48,18 @@ const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-card/30 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+          <div className="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-foreground/20 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-secondary drop-shadow-md">50+</div>
-              <div className="text-sm text-card/90 mt-1 drop-shadow-sm">Tahun Berdiri</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary">50+</div>
+              <div className="text-sm text-foreground/80 mt-1">Tahun Berdiri</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-secondary drop-shadow-md">1000+</div>
-              <div className="text-sm text-card/90 mt-1 drop-shadow-sm">Jamaah</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary">1000+</div>
+              <div className="text-sm text-foreground/80 mt-1">Jamaah</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-secondary drop-shadow-md">15+</div>
-              <div className="text-sm text-card/90 mt-1 drop-shadow-sm">Program Aktif</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary">15+</div>
+              <div className="text-sm text-foreground/80 mt-1">Program Aktif</div>
             </div>
           </div>
         </div>
