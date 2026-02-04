@@ -12,7 +12,8 @@ import {
   Search, 
   FileText,
   Filter,
-  Download
+  Download,
+  Loader2
 } from "lucide-react";
 import {
   Dialog,
@@ -31,93 +32,67 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
-
-// Sample data
-const suratMasuk = [
-  {
-    id: "1",
-    nomorSurat: "001/SM/PRNU-WRH/I/2024",
-    perihal: "Undangan Rapat Koordinasi MWCNU",
-    tanggal: "15 Januari 2024",
-    pengirim: "MWCNU Gandrungmangu",
-    type: "masuk" as const,
-    status: "selesai" as const,
-  },
-  {
-    id: "2",
-    nomorSurat: "002/SM/PRNU-WRH/I/2024",
-    perihal: "Permohonan Pengajian Akbar",
-    tanggal: "20 Januari 2024",
-    pengirim: "Fatayat NU Wringinharjo",
-    type: "masuk" as const,
-    status: "proses" as const,
-  },
-  {
-    id: "3",
-    nomorSurat: "003/SM/PRNU-WRH/II/2024",
-    perihal: "Surat Edaran Ramadhan 1445 H",
-    tanggal: "1 Februari 2024",
-    pengirim: "PCNU Cilacap",
-    type: "masuk" as const,
-    status: "pending" as const,
-  },
-];
-
-const suratKeluar = [
-  {
-    id: "1",
-    nomorSurat: "001/SK/PRNU-WRH/I/2024",
-    perihal: "Laporan Kegiatan Triwulan IV 2023",
-    tanggal: "5 Januari 2024",
-    penerima: "MWCNU Gandrungmangu",
-    type: "keluar" as const,
-    status: "selesai" as const,
-  },
-  {
-    id: "2",
-    nomorSurat: "002/SK/PRNU-WRH/I/2024",
-    perihal: "Permohonan Narasumber Pengajian",
-    tanggal: "18 Januari 2024",
-    penerima: "KH. Ahmad Fauzi",
-    type: "keluar" as const,
-    status: "selesai" as const,
-  },
-  {
-    id: "3",
-    nomorSurat: "003/SK/PRNU-WRH/II/2024",
-    perihal: "Undangan Haul Akbar",
-    tanggal: "10 Februari 2024",
-    penerima: "Seluruh Jamaah NU Wringinharjo",
-    type: "keluar" as const,
-    status: "proses" as const,
-  },
-];
+import { useLetters, useCreateLetter, type LetterType, type LetterStatus } from "@/hooks/useLetters";
+import { format } from "date-fns";
 
 const Persuratan = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    type: "" as LetterType | "",
+    nomor_surat: "",
+    perihal: "",
+    pengirim_penerima: "",
+    isi: "",
+  });
+
+  const { data: suratMasuk = [], isLoading: loadingMasuk } = useLetters("masuk");
+  const { data: suratKeluar = [], isLoading: loadingKeluar } = useLetters("keluar");
+  const createLetter = useCreateLetter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Surat berhasil dibuat!",
-      description: "Surat baru telah ditambahkan ke dalam sistem.",
+    
+    if (!formData.type || !formData.nomor_surat || !formData.perihal) {
+      return;
+    }
+
+    createLetter.mutate({
+      type: formData.type,
+      nomor_surat: formData.nomor_surat,
+      perihal: formData.perihal,
+      pengirim: formData.type === "masuk" ? formData.pengirim_penerima : undefined,
+      penerima: formData.type === "keluar" ? formData.pengirim_penerima : undefined,
+      isi: formData.isi || undefined,
+      tanggal: format(new Date(), "yyyy-MM-dd"),
+    }, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        setFormData({
+          type: "",
+          nomor_surat: "",
+          perihal: "",
+          pengirim_penerima: "",
+          isi: "",
+        });
+      }
     });
-    setIsDialogOpen(false);
   };
 
   const filteredMasuk = suratMasuk.filter(
     (surat) =>
       surat.perihal.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      surat.nomorSurat.toLowerCase().includes(searchTerm.toLowerCase())
+      surat.nomor_surat.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredKeluar = suratKeluar.filter(
     (surat) =>
       surat.perihal.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      surat.nomorSurat.toLowerCase().includes(searchTerm.toLowerCase())
+      surat.nomor_surat.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalProses = [...suratMasuk, ...suratKeluar].filter(s => s.status === "proses").length;
+  const totalSelesai = [...suratMasuk, ...suratKeluar].filter(s => s.status === "selesai").length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -174,9 +149,7 @@ const Persuratan = () => {
                   <FileText className="w-5 h-5 text-accent-foreground" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {suratMasuk.filter(s => s.status === "proses").length + suratKeluar.filter(s => s.status === "proses").length}
-                  </p>
+                  <p className="text-2xl font-bold text-foreground">{totalProses}</p>
                   <p className="text-sm text-muted-foreground">Diproses</p>
                 </div>
               </div>
@@ -187,9 +160,7 @@ const Persuratan = () => {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {suratMasuk.filter(s => s.status === "selesai").length + suratKeluar.filter(s => s.status === "selesai").length}
-                  </p>
+                  <p className="text-2xl font-bold text-foreground">{totalSelesai}</p>
                   <p className="text-sm text-muted-foreground">Selesai</p>
                 </div>
               </div>
@@ -233,7 +204,10 @@ const Persuratan = () => {
                   <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="type">Jenis Surat</Label>
-                      <Select>
+                      <Select 
+                        value={formData.type} 
+                        onValueChange={(value: LetterType) => setFormData({ ...formData, type: value })}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih jenis surat" />
                         </SelectTrigger>
@@ -245,25 +219,53 @@ const Persuratan = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="nomor">Nomor Surat</Label>
-                      <Input id="nomor" placeholder="Contoh: 001/SK/PRNU-WRH/I/2024" />
+                      <Input 
+                        id="nomor" 
+                        placeholder="Contoh: 001/SK/PRNU-WRH/I/2024" 
+                        value={formData.nomor_surat}
+                        onChange={(e) => setFormData({ ...formData, nomor_surat: e.target.value })}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="perihal">Perihal</Label>
-                      <Input id="perihal" placeholder="Masukkan perihal surat" />
+                      <Input 
+                        id="perihal" 
+                        placeholder="Masukkan perihal surat" 
+                        value={formData.perihal}
+                        onChange={(e) => setFormData({ ...formData, perihal: e.target.value })}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="tujuan">Pengirim/Penerima</Label>
-                      <Input id="tujuan" placeholder="Masukkan nama pengirim atau penerima" />
+                      <Label htmlFor="tujuan">
+                        {formData.type === "keluar" ? "Penerima" : "Pengirim"}
+                      </Label>
+                      <Input 
+                        id="tujuan" 
+                        placeholder={`Masukkan nama ${formData.type === "keluar" ? "penerima" : "pengirim"}`}
+                        value={formData.pengirim_penerima}
+                        onChange={(e) => setFormData({ ...formData, pengirim_penerima: e.target.value })}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="isi">Isi Surat</Label>
-                      <Textarea id="isi" placeholder="Masukkan isi surat..." rows={4} />
+                      <Textarea 
+                        id="isi" 
+                        placeholder="Masukkan isi surat..." 
+                        rows={4} 
+                        value={formData.isi}
+                        onChange={(e) => setFormData({ ...formData, isi: e.target.value })}
+                      />
                     </div>
                     <div className="flex justify-end gap-2 pt-4">
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         Batal
                       </Button>
-                      <Button type="submit">Simpan Surat</Button>
+                      <Button type="submit" disabled={createLetter.isPending}>
+                        {createLetter.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        Simpan Surat
+                      </Button>
                     </div>
                   </form>
                 </DialogContent>
@@ -285,10 +287,23 @@ const Persuratan = () => {
             </TabsList>
 
             <TabsContent value="masuk">
-              {filteredMasuk.length > 0 ? (
+              {loadingMasuk ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : filteredMasuk.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredMasuk.map((surat) => (
-                    <LetterCard key={surat.id} {...surat} />
+                    <LetterCard 
+                      key={surat.id} 
+                      id={surat.id}
+                      nomorSurat={surat.nomor_surat}
+                      perihal={surat.perihal}
+                      tanggal={format(new Date(surat.tanggal), "dd MMMM yyyy")}
+                      pengirim={surat.pengirim || undefined}
+                      type="masuk"
+                      status={surat.status}
+                    />
                   ))}
                 </div>
               ) : (
@@ -301,10 +316,23 @@ const Persuratan = () => {
             </TabsContent>
 
             <TabsContent value="keluar">
-              {filteredKeluar.length > 0 ? (
+              {loadingKeluar ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : filteredKeluar.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredKeluar.map((surat) => (
-                    <LetterCard key={surat.id} {...surat} />
+                    <LetterCard 
+                      key={surat.id} 
+                      id={surat.id}
+                      nomorSurat={surat.nomor_surat}
+                      perihal={surat.perihal}
+                      tanggal={format(new Date(surat.tanggal), "dd MMMM yyyy")}
+                      penerima={surat.penerima || undefined}
+                      type="keluar"
+                      status={surat.status}
+                    />
                   ))}
                 </div>
               ) : (
