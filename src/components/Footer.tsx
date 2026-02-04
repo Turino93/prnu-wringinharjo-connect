@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Instagram, Youtube } from "lucide-react";
+import logoNU from "@/assets/logo-nu.jpg";
 
 const Footer = () => {
   return (
@@ -9,9 +10,11 @@ const Footer = () => {
           {/* About */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <span className="font-bold text-xl">NU</span>
-              </div>
+              <img 
+                src={logoNU} 
+                alt="Logo PRNU Wringinharjo" 
+                className="w-12 h-12 rounded-full object-cover bg-white"
+              />
               <div>
                 <h3 className="font-bold text-lg">PRNU Wringinharjo</h3>
                 <p className="text-sm opacity-80">Nahdlatul Ulama</p>
