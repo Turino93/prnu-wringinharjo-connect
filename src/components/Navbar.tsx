@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import logoNU from "@/assets/logo-nu.jpg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,9 +38,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full gradient-primary flex items-center justify-center shadow-md">
-              <span className="text-primary-foreground font-bold text-lg md:text-xl">NU</span>
-            </div>
+            <img 
+              src={logoNU} 
+              alt="Logo PRNU Wringinharjo" 
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover shadow-md"
+            />
             <div className="hidden sm:block">
               <h1 className="font-bold text-foreground text-sm md:text-base">PRNU Wringinharjo</h1>
               <p className="text-xs text-muted-foreground">Nahdlatul Ulama</p>
