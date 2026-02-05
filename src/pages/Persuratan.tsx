@@ -105,15 +105,15 @@ const Persuratan = () => {
       {/* Hero Section */}
       <section className="pt-28 pb-16 gradient-hero islamic-pattern">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center text-primary-foreground">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 border border-primary-foreground/20 mb-6 animate-fade-in">
-              <FileText className="w-4 h-4" />
-              <span className="text-sm font-medium">Sistem Persuratan Digital</span>
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border mb-6 animate-fade-in shadow-md">
+              <FileText className="w-4 h-4 text-foreground" />
+              <span className="text-sm font-medium text-foreground">Sistem Persuratan Digital</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up text-foreground" style={{ animationDelay: "0.1s" }}>
               Layanan Persuratan
             </h1>
-            <p className="text-lg opacity-90 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+            <p className="text-lg animate-fade-in-up text-foreground/80" style={{ animationDelay: "0.2s" }}>
               Kelola surat masuk dan surat keluar organisasi secara digital dengan mudah dan terorganisir
             </p>
           </div>
