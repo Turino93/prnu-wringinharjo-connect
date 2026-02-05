@@ -19,7 +19,7 @@ const HeroSection = () => {
 
           {/* Main Heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-in-up text-foreground" style={{ animationDelay: "0.1s" }}>
-            Pimpinan Ranting<br />
+            Pengurus Ranting<br />
             <span className="text-secondary">Nahdlatul Ulama</span><br />
             Wringinharjo
           </h1>
