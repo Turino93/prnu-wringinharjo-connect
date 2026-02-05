@@ -68,11 +68,11 @@ const Kontak = () => {
       {/* Hero Section */}
       <section className="pt-28 pb-16 gradient-hero islamic-pattern">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center text-primary-foreground">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in text-foreground">
               Hubungi Kami
             </h1>
-            <p className="text-lg opacity-90 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+            <p className="text-lg animate-fade-in-up text-foreground/80" style={{ animationDelay: "0.1s" }}>
               Silakan hubungi kami untuk informasi lebih lanjut atau keperluan lainnya
             </p>
           </div>
